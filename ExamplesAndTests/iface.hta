@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Looking at an interface</title>
+<HTA:APPLICATION
+  APPLICATIONNAME="iface"
+  ID="iface"
+  VERSION="1.0"/>
+</head>
+
+<script language="VBScript">
+
+Sub Window_OnLoad
+  'This method will be called when the application loads
+  'Add your code here
+  'alert("Hello I am here")
+End Sub
+Sub getinfo
+  'alert("Calling sub")
+  'document.getElementById("TheData").innerHTML="<pre>Found it<br>Another line</pre>"
+  Set oShell  = CreateObject("WScript.Shell")
+  appCmd      = "powershell.exe C:\Users\jbeckett\Desktop\iface.ps1"
+  oShell.Run appCmd, 0, True
+  txt=document.parentwindow.clipboardData.GetData("text")
+  arrLines = Split(txt,vbCrLf)
+  arrCols = Split(arrLines(3)," ")
+  document.getElementById("TheData").innerHTML=arrLines(3)
+
+
+End Sub
+
+</script>
+
+<body bgcolor="white">
+
+<!--Add your controls here-->
+<input type="button" value="Get IP Info" onclick="getinfo"><br><br>
+<div id="TheData">Data goes here</div>
+
+<!--{{InsertControlsHere}}-Do not remove this line-->
+</body>
+</html>

@@ -1,0 +1,47 @@
+<head>
+<title>HTA Test</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="HTA Test"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+     VERSION="1.0"/>
+</head>
+
+<script language="VBScript">
+    Sub getinfo
+        alert(document.getElementById("TheData").value)
+		mydata = document.getElementById("TheData").value
+		document.getElementById("MyAnswer").innerHTML = mydata + 5
+    End Sub
+	Sub createUser
+		'alert(document.getElementById("fname").value)
+		finame = document.getElementById("fname").value
+		laname = document.getElementById("lname").value
+		usname = document.getElementById("uname").value
+		paword1 = document.getElementById("pword1").value
+		paword2 = document.getElementById("pword2").value	
+		If paword1 <> paword2 Then alert("Error: Passwords do not match.") End If
+		'Exit Sub End If
+		If ((finame = "") Or (laname = "") Or (usname = "") Or (paword1 = "") Or (paword2 = "")) Then 
+		alert("Error: Please fill out all fields.") 
+		End If
+		userInfoStringHead = "The user has been created."
+		document.getElementById("UserInfo").innerHTML = "The user " + usname + " has been created."
+	End Sub
+</script>
+
+<body>
+<h1>Create a new user</h1>
+First Name:<br />
+<input type="text" id="fname" /><br />
+Last Name:<br />
+<input type="text" id="lname" /><br />
+Username:<br />
+<input type="text" id="uname" /><br />
+Password:<br />
+<input type="password" id="pword1" /><br />
+Confirm Password:<br />
+<input type="password" id="pword2" /><br /><br />
+<input type="button" value="Create User" onclick="createUser" />
+<div id="UserInfo" />
+</body>

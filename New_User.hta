@@ -1,0 +1,75 @@
+<head>
+<title>New User</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="New User"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+     VERSION="1.0"/>
+</head>
+
+<script language="VBScript">
+	Sub modifyUser
+	
+	End Sub
+	
+	Sub createUser
+		'alert(document.getElementById("fname").value)
+		' Collect variables from HTML
+		finame = document.getElementById("fname").value
+		laname = document.getElementById("lname").value
+		usname = document.getElementById("uname").value
+		paword1 = document.getElementById("pword1").value
+		paword2 = document.getElementById("pword2").value	
+
+		' Make sure passwords match
+		If paword1 <> paword2 Then 
+			alert("Error: Passwords do not match.") 
+		Exit Sub
+		End If
+		
+		' Make sure all fields are filled out
+		If ((finame = "") Or (laname = "") Or (usname = "") Or (paword1 = "") Or (paword2 = "")) Then 
+			alert("Error: Please fill out all fields.") 
+		Exit Sub
+		End If
+
+		document.getElementByID("resultInfo").innerHTML = "Loading..."
+		
+		' Create command to call the Powershell script and pass in paramaters
+		scriptArgs = " -firstName " & finame & " -lastName " & laname & " -userName " & usname & " -pass " & paword1
+		scriptPath = "C:\Scripts\Create-User.ps1" & scriptArgs
+		appCmd = "powershell.exe -ExecutionPolicy Unrestricted " & scriptPath
+		
+		' Run the Powershell script
+		Set oShell = CreateObject("Wscript.Shell")
+		result = oShell.Run(appCmd, 0, true)
+
+		' Get data from Powershell via clipboard
+		sResultData = window.clipboarddata.getdata("Text")
+		
+		'Check if PowerShell script returned an error  
+        If Result = 1 Then
+			' Warning result
+			document.getElementByID("resultInfo").innerHTML = "<font color='red'>Error: </font>" & sResultData
+        Else
+			' Success result
+			document.getElementByID("resultInfo").innerHTML = "<font color='green'>Success: </font>" & sResultData
+        End If		
+	End Sub
+</script>
+
+<body>
+<h1>Create a new user</h1>
+First Name:<br />
+<input type="text" id="fname" /><br />
+Last Name:<br />
+<input type="text" id="lname" /><br />
+Username:<br />
+<input type="text" id="uname" /><br />
+Password:<br />
+<input type="password" id="pword1" /><br />
+Confirm Password:<br />
+<input type="password" id="pword2" /><br /><br />
+<input type="button" value="Create User" onclick="createUser" />
+<div id="resultInfo" />
+</body>

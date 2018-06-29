@@ -1,0 +1,15 @@
+HTA Data Pathways:
+User -> OS
+	HTML form elements
+	VBScript - document.getElementById
+	Parameters sent to PowerShell
+OS -> User
+	Return from PowerShell
+	VBScript - document.getElementById
+	HTML form elements
+
+type="text" works for many cases
+	"password" an alternative
+Use id=
+Data:<input type="text" id="TheData" />
+

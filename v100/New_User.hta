@@ -1,0 +1,117 @@
+<head>
+<title>New User</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="New User"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+     VERSION="1.0"/>
+</head>
+
+<script language="VBScript">
+	' Collects and validates the user supplied data, then
+	' calls a Powershell script, passing in the user information,
+	' which creates the user and returns a status message.
+	Sub createUser
+
+		' Get current working directory (to be used when calling Powershell)
+		cwd = window.location.pathname		
+		cwd = Left(cwd,InStrRev(cwd,"\"))
+
+		' Collect variables from HTML.
+		finame = document.getElementById("fname").value
+		laname = document.getElementById("lname").value
+		usname = document.getElementById("uname").value
+		paword1 = document.getElementById("pword1").value
+		paword2 = document.getElementById("pword2").value
+		ou1 = document.getElementById("ou").value
+		
+		' Make sure passwords match.
+		If paword1 <> paword2 Then 
+			alert("Error: Passwords do not match.") 
+			Exit Sub
+		End If
+		
+		' Make sure all fields are filled out.
+		If ((finame = "") Or (laname = "") Or (usname = "") Or (paword1 = "") Or (paword2 = "")) Then 
+			alert("Error: Please fill out all required fields.") 
+			'Exit Sub
+		End If
+
+		document.getElementByID("resultInfo").innerHTML = "Loading..."
+		
+		' Define parameters to pass into Powershell.
+		' If no OU is specified, do not include it in the Powershell command.
+		IF (ou1 = "") Then
+			scriptArgs = " -firstName " & finame & " -lastName " & laname & " -userName " & usname & " -pass " & paword1
+		' If an OU is specified, include it in the Powershell command.
+		Else 
+			scriptArgs = " -firstName " & finame & " -lastName " & laname & " -userName " & usname & " -pass " & paword1 & " -ou " & "'" & ou1 & "'"
+		End If
+		
+		' Create command to call the Powershell script.
+		scriptPath = cwd & "Scripts\Create-User.ps1" & scriptArgs
+		alert(scriptPath)
+		' To help troubleshoot, add the -NoExit flag to the command below.
+		appCmd = "powershell.exe -ExecutionPolicy Unrestricted " & scriptPath
+		
+		' Run the Powershell script.
+		Set oShell = CreateObject("Wscript.Shell")
+		' To help troubleshoot, change the "0" to a "1" below.
+		Result = oShell.Run(appCmd, 0, true)
+
+		' Get data from Powershell via clipboard.
+		sResultData = window.clipboarddata.getdata("Text")
+		
+		' Print returned data.
+		alert(sResultData)
+		document.getElementByID("resultInfo").innerHTML = sResultData	
+
+	End Sub
+	
+	' Call a Powershell script which looks up the OUs in the domain
+	' and has the user select one via Out-GridView. Populates the
+	' OU text box with the selected OU's Distinguished Name.
+	Sub lookupOUs
+
+		' Get current working directory (to be used when calling Powershell)
+		cwd = window.location.pathname		
+		cwd = Left(cwd,InStrRev(cwd,"\"))
+	
+		' Create command to call the Powershell script
+		scriptPath = cwd & "Scripts\Get-OUs.ps1"
+		appCmd = "powershell.exe -ExecutionPolicy Unrestricted " & scriptPath
+		
+		' Run the Powershell script
+		Set Shell = CreateObject("Wscript.Shell")
+		scriptResult = Shell.Run(appCmd, 0, true)
+		
+		' Get returned data (the DN of the OU) from Powershell
+		ouResultData = window.clipboarddata.getdata("Text")
+		
+		' Populate the OU text box with the returned data
+		document.getElementById("ou").value = ouResultData
+	
+	End Sub
+</script>
+
+<body>
+
+<h1>Create a new user</h1>
+First Name:<br />
+<input type="text" id="fname" /><br />
+Last Name:<br />
+<input type="text" id="lname" /><br />
+Username:<br />
+<input type="text" id="uname" /><br />
+Password:<br />
+<input type="password" id="pword1" /><br />
+Confirm Password:<br />
+<input type="password" id="pword2" /><br />
+(Optional) Select an OU to place the user in by clicking "Lookup OUs":<br />
+<input type="text" id="ou" /><input type="button" value="Lookup OUs" onclick="lookupOUs" /><br />
+<br />
+<input type="button" value="Create User" onclick="createUser" />
+<br /><br />
+<div id="resultInfo" />
+
+</body>

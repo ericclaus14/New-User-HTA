@@ -1,0 +1,2 @@
+$if = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 | Format-Wide -Property InterfaceIndex -Column 1 | Out-String)
+Get-NetIPAddress -InterfaceIndex $if | Format-Wide -Property IPAddress -Column 1 | Out-String
