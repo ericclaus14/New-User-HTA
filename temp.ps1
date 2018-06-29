@@ -5,3 +5,5 @@ Write-Host $userInput
 $myArr = @("Hello","My","Person")
 
 $myArr | Out-GridView
+
+$a = 5
